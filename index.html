@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Jose Parreno Garcia" />
+
+
+<title>Linear models</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Linear models</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Linear models</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Linear models</h1>
+<h4 class="author"><em>Jose Parreno Garcia</em></h4>
+<h4 class="date"><em>February 2018</em></h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#linear-regression-model-with-lm"><span class="toc-section-number">1</span> Linear regression model with lm()</a><ul>
+<li><a href="#fitting-a-linear-model"><span class="toc-section-number">1.1</span> Fitting a linear model</a></li>
+<li><a href="#summarizing-linear-model-fits"><span class="toc-section-number">1.2</span> Summarizing Linear Model Fits</a></li>
+<li><a href="#predicting-using-linear-regression"><span class="toc-section-number">1.3</span> Predicting using linear regression</a></li>
+<li><a href="#generating-a-diagnostic-plot-of-a-fitted-model"><span class="toc-section-number">1.4</span> Generating a diagnostic plot of a fitted model</a></li>
+</ul></li>
+<li><a href="#fitting-a-polynomial-regression-model-with-lm"><span class="toc-section-number">2</span> Fitting a polynomial regression model with lm()</a></li>
+<li><a href="#fitting-a-robust-linear-regression-model-with-rlm"><span class="toc-section-number">3</span> Fitting a robust linear regression model with rlm</a></li>
+<li><a href="#studying-a-case-of-linear-regression-on-slid-data"><span class="toc-section-number">4</span> Studying a case of linear regression on SLID data</a><ul>
+<li><a href="#first-linear-model"><span class="toc-section-number">4.1</span> First linear model</a></li>
+<li><a href="#second-linear-model"><span class="toc-section-number">4.2</span> Second linear model</a></li>
+<li><a href="#third-linear-model"><span class="toc-section-number">4.3</span> Third linear model</a><ul>
+<li><a href="#checking-multicolinearity"><span class="toc-section-number">4.3.1</span> Checking multicolinearity</a></li>
+<li><a href="#checking-heteroscedasticity"><span class="toc-section-number">4.3.2</span> Checking Heteroscedasticity</a></li>
+<li><a href="#ols"><span class="toc-section-number">4.3.3</span> OLS</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#glms"><span class="toc-section-number">5</span> GLMs</a><ul>
+<li><a href="#gaussian-model-in-a-glm"><span class="toc-section-number">5.1</span> Gaussian model in a GLM</a></li>
+<li><a href="#poisson-model-in-a-glm"><span class="toc-section-number">5.2</span> Poisson model in a GLM</a></li>
+<li><a href="#binomial-model-in-a-glm"><span class="toc-section-number">5.3</span> Binomial model in a GLM</a></li>
+</ul></li>
+<li><a href="#gams"><span class="toc-section-number">6</span> GAMs</a><ul>
+<li><a href="#fit-gam"><span class="toc-section-number">6.1</span> Fit GAM</a></li>
+<li><a href="#visualize-gam"><span class="toc-section-number">6.2</span> Visualize GAM</a></li>
+<li><a href="#diagnose-gam"><span class="toc-section-number">6.3</span> Diagnose GAM</a></li>
+</ul></li>
+</ul>
+</div>
+
+<style>
+body {
+text-align: justify}
+
+</style>
+<p><br></p>
+<pre class="r"><code>library(knitr)</code></pre>
+<p><br></p>
+<p>We will look at:</p>
+<ul>
+<li>Linear regression model with lm()</li>
+<li>Fitting a polynomial regression model with lm()</li>
+<li>Fitting a robust linear regression model with rlm</li>
+<li>Studying a case of linear regression on SLID data</li>
+<li>GLMs</li>
+<li>GAMs</li>
+</ul>
+<p><br></p>
+<div id="linear-regression-model-with-lm" class="section level1">
+<h1><span class="header-section-number">1</span> Linear regression model with lm()</h1>
+<p><img src="images/1.PNG" width="728" /><img src="images/2.PNG" width="727" /><img src="images/3.PNG" width="700" /><img src="images/4.PNG" width="706" /></p>
+<div id="fitting-a-linear-model" class="section level2">
+<h2><span class="header-section-number">1.1</span> Fitting a linear model</h2>
+<pre class="r"><code>library(car)
+
+# Load data
+data(Quartet)
+
+# Structure of the data
+str(Quartet)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    11 obs. of  6 variables:
+##  $ x : int  10 8 13 9 11 14 6 4 12 7 ...
+##  $ y1: num  8.04 6.95 7.58 8.81 8.33 ...
+##  $ y2: num  9.14 8.14 8.74 8.77 9.26 8.1 6.13 3.1 9.13 7.26 ...
+##  $ y3: num  7.46 6.77 12.74 7.11 7.81 ...
+##  $ x4: int  8 8 8 8 8 8 8 19 8 8 ...
+##  $ y4: num  6.58 5.76 7.71 8.84 8.47 7.04 5.25 12.5 5.56 7.91 ...</code></pre>
+<pre class="r"><code># Simple plot to get an idea
+plot(Quartet$x, Quartet$y1)
+
+# Creating linear model
+lmfit = lm(y1~x, Quartet)
+lmfit</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y1 ~ x, data = Quartet)
+## 
+## Coefficients:
+## (Intercept)            x  
+##      3.0001       0.5001</code></pre>
+<pre class="r"><code># Plotting again with the fitted line
+plot(Quartet$x, Quartet$y1)
+abline(lmfit, col=&quot;red&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-98-1.png" /><!-- --></p>
+</div>
+<div id="summarizing-linear-model-fits" class="section level2">
+<h2><span class="header-section-number">1.2</span> Summarizing Linear Model Fits</h2>
+<pre class="r"><code># Provides multiple interesting information
+summary(lmfit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y1 ~ x, data = Quartet)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.92127 -0.45577 -0.04136  0.70941  1.83882 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)   3.0001     1.1247   2.667  0.02573 * 
+## x             0.5001     0.1179   4.241  0.00217 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.237 on 9 degrees of freedom
+## Multiple R-squared:  0.6665, Adjusted R-squared:  0.6295 
+## F-statistic: 17.99 on 1 and 9 DF,  p-value: 0.00217</code></pre>
+<pre class="r"><code># Get the coefficients
+coefficients(lmfit) </code></pre>
+<pre><code>## (Intercept)           x 
+##   3.0000909   0.5000909</code></pre>
+<pre class="r"><code># Get the confidence intervals
+confint(lmfit, level=0.95) </code></pre>
+<pre><code>##                 2.5 %    97.5 %
+## (Intercept) 0.4557369 5.5444449
+## x           0.2333701 0.7668117</code></pre>
+<pre class="r"><code># Extracts the predicted values for each observation
+fitted(lmfit) </code></pre>
+<pre><code>##         1         2         3         4         5         6         7         8         9        10        11 
+##  8.001000  7.000818  9.501273  7.500909  8.501091 10.001364  6.000636  5.000455  9.001182  6.500727  5.500545</code></pre>
+<pre class="r"><code># Extracts the errors made for each observation
+residuals(lmfit) </code></pre>
+<pre><code>##           1           2           3           4           5           6           7           8           9          10          11 
+##  0.03900000 -0.05081818 -1.92127273  1.30909091 -0.17109091 -0.04136364  1.23936364 -0.74045455  1.83881818 -1.68072727  0.17945455</code></pre>
+<pre class="r"><code># ANOVA test
+anova(lmfit) </code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: y1
+##           Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+## x          1 27.510 27.5100   17.99 0.00217 **
+## Residuals  9 13.763  1.5292                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Variance-covariance matrix
+vcov(lmfit) </code></pre>
+<pre><code>##             (Intercept)           x
+## (Intercept)   1.2650553 -0.12511536
+## x            -0.1251154  0.01390171</code></pre>
+<pre class="r"><code># Quality of regression fits
+influence(lmfit) </code></pre>
+<pre><code>## $hat
+##          1          2          3          4          5          6          7          8          9         10         11 
+## 0.10000000 0.10000000 0.23636364 0.09090909 0.12727273 0.31818182 0.17272727 0.31818182 0.17272727 0.12727273 0.23636364 
+## 
+## $coefficients
+##      (Intercept)             x
+## 1   0.0003939394  3.939394e-04
+## 2  -0.0097529844  5.133150e-04
+## 3   0.5946796537 -9.148918e-02
+## 4   0.1309090909 -1.323195e-18
+## 5   0.0142575758 -3.564394e-03
+## 6   0.0193030303 -2.757576e-03
+## 7   0.5039170829 -4.085814e-02
+## 8  -0.5430000000  4.936364e-02
+## 9  -0.3435154845  6.062038e-02
+## 10 -0.4902121212  3.501515e-02
+## 11  0.0982727273 -8.545455e-03
+## 
+## $sigma
+##        1        2        3        4        5        6        7        8        9       10       11 
+## 1.311535 1.311479 1.056460 1.218483 1.310017 1.311496 1.219936 1.272721 1.099742 1.147055 1.309605 
+## 
+## $wt.res
+##           1           2           3           4           5           6           7           8           9          10          11 
+##  0.03900000 -0.05081818 -1.92127273  1.30909091 -0.17109091 -0.04136364  1.23936364 -0.74045455  1.83881818 -1.68072727  0.17945455</code></pre>
+</div>
+<div id="predicting-using-linear-regression" class="section level2">
+<h2><span class="header-section-number">1.3</span> Predicting using linear regression</h2>
+<pre class="r"><code># Linear model
+lmfit = lm(y1~x, Quartet)
+
+# Create new data
+newdata = data.frame(x = c(3,6,15))
+
+# Prediction with confidence intervals
+predict(lmfit, newdata, interval=&quot;confidence&quot;, level=0.95)</code></pre>
+<pre><code>##         fit      lwr       upr
+## 1  4.500364 2.691375  6.309352
+## 2  6.000636 4.838027  7.163245
+## 3 10.501455 8.692466 12.310443</code></pre>
+<pre class="r"><code>#
+predict(lmfit, newdata, interval=&quot;predict&quot;)</code></pre>
+<pre><code>##         fit      lwr       upr
+## 1  4.500364 1.169022  7.831705
+## 2  6.000636 2.971271  9.030002
+## 3 10.501455 7.170113 13.832796</code></pre>
+</div>
+<div id="generating-a-diagnostic-plot-of-a-fitted-model" class="section level2">
+<h2><span class="header-section-number">1.4</span> Generating a diagnostic plot of a fitted model</h2>
+<pre class="r"><code>par(mfrow=c(2,2))
+
+plot(lmfit)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-101-1.png" /><!-- --></p>
+<pre class="r"><code># To find outliers
+plot(cooks.distance(lmfit))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-101-2.png" /><!-- --></p>
+<p><br></p>
+</div>
+</div>
+<div id="fitting-a-polynomial-regression-model-with-lm" class="section level1">
+<h1><span class="header-section-number">2</span> Fitting a polynomial regression model with lm()</h1>
+<p><img src="images/5.PNG" width="676" /></p>
+<pre class="r"><code># Clearly non-linea relationship
+plot(Quartet$x, Quartet$y2)
+
+# Add a non-linear input variable using the poly function
+lmfit = lm(Quartet$y2~poly(Quartet$x,2)) 
+summary(lmfit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Quartet$y2 ~ poly(Quartet$x, 2))
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -0.0013287 -0.0011888 -0.0006294  0.0008741  0.0023776 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)          7.5009091  0.0005043   14875   &lt;2e-16 ***
+## poly(Quartet$x, 2)1  5.2440442  0.0016725    3135   &lt;2e-16 ***
+## poly(Quartet$x, 2)2 -3.7116396  0.0016725   -2219   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.001672 on 8 degrees of freedom
+## Multiple R-squared:      1,  Adjusted R-squared:      1 
+## F-statistic: 7.378e+06 on 2 and 8 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># Plotting
+plot(Quartet$x, Quartet$y2)
+lines(sort(Quartet$x), lmfit$fit[order(Quartet$x)], col = &quot;red&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-103-1.png" /><!-- --></p>
+<p><br></p>
+</div>
+<div id="fitting-a-robust-linear-regression-model-with-rlm" class="section level1">
+<h1><span class="header-section-number">3</span> Fitting a robust linear regression model with rlm</h1>
+<p>We will check for outliers and remove them.</p>
+<pre class="r"><code># Clearly outlier
+plot(Quartet$x, Quartet$y3)
+
+# Creating a normal linear model -&gt; due to the outlier, the line is pushed up!
+lmfit_normal = lm(Quartet$y3~Quartet$x)
+plot(Quartet$x, Quartet$y3)
+abline(lmfit_normal, col=&quot;red&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-104-1.png" /><!-- --></p>
+<pre class="r"><code># Creating a robust linear model -&gt; rlm can capture outliers and exlcude them from the calculation of the model
+library(MASS)
+lmfit = rlm(Quartet$y3~Quartet$x)
+plot(Quartet$x, Quartet$y3)
+abline(lmfit, col=&quot;red&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-104-2.png" /><!-- --></p>
+<p><br></p>
+</div>
+<div id="studying-a-case-of-linear-regression-on-slid-data" class="section level1">
+<h1><span class="header-section-number">4</span> Studying a case of linear regression on SLID data</h1>
+<p>We start with a simple model and start changing it to get better predictions</p>
+<pre class="r"><code>library(car)
+str(SLID)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    7425 obs. of  5 variables:
+##  $ wages    : num  10.6 11 NA 17.8 NA ...
+##  $ education: num  15 13.2 16 14 8 16 12 14.5 15 10 ...
+##  $ age      : int  40 19 49 46 71 50 70 42 31 56 ...
+##  $ sex      : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 2 2 2 2 2 1 1 1 2 1 ...
+##  $ language : Factor w/ 3 levels &quot;English&quot;,&quot;French&quot;,..: 1 1 3 3 1 1 1 1 1 1 ...</code></pre>
+<pre class="r"><code># PLOTTING
+par(mfrow=c(2,2))
+
+# from first plot, there is apparently no correlation between wages and languages
+plot(SLID$wages ~ SLID$language)
+
+# age does seems to have a slight positive correlation
+plot(SLID$wages ~ SLID$age)
+
+# education clearly shows a positive correlation with wages
+plot(SLID$wages ~ SLID$education)
+
+# as per sex, this plot shows higher wages for men
+plot(SLID$wages ~ SLID$sex)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-105-1.png" /><!-- --></p>
+<div id="first-linear-model" class="section level2">
+<h2><span class="header-section-number">4.1</span> First linear model</h2>
+<pre class="r"><code># Input all data (except obviously for wages which is the response var!)
+lmfit = lm(wages ~ ., data = SLID)
+
+## Clearly, as we thought before, languages are not correlated with wages, therefore, it appears to be a non-significant variables with a p-value of 0.05. We should simplify this model by removing the variable.
+summary(lmfit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wages ~ ., data = SLID)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.062  -4.347  -0.797   3.237  35.908 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    -7.888779   0.612263 -12.885   &lt;2e-16 ***
+## education       0.916614   0.034762  26.368   &lt;2e-16 ***
+## age             0.255137   0.008714  29.278   &lt;2e-16 ***
+## sexMale         3.455411   0.209195  16.518   &lt;2e-16 ***
+## languageFrench -0.015223   0.426732  -0.036    0.972    
+## languageOther   0.142605   0.325058   0.439    0.661    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.6 on 3981 degrees of freedom
+##   (3438 observations deleted due to missingness)
+## Multiple R-squared:  0.2973, Adjusted R-squared:  0.2964 
+## F-statistic: 336.8 on 5 and 3981 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="second-linear-model" class="section level2">
+<h2><span class="header-section-number">4.2</span> Second linear model</h2>
+<pre class="r"><code># Removing the language variable
+lmfit = lm(wages ~ age + sex + education, data = SLID)
+summary(lmfit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wages ~ age + sex + education, data = SLID)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.111  -4.328  -0.792   3.243  35.892 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -7.905243   0.607771  -13.01   &lt;2e-16 ***
+## age          0.255101   0.008634   29.55   &lt;2e-16 ***
+## sexMale      3.465251   0.208494   16.62   &lt;2e-16 ***
+## education    0.918735   0.034514   26.62   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.602 on 4010 degrees of freedom
+##   (3411 observations deleted due to missingness)
+## Multiple R-squared:  0.2972, Adjusted R-squared:  0.2967 
+## F-statistic: 565.3 on 3 and 4010 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code># From the plots we see that the residuals of smaller fitted values are biased towards the fitted model. Can that be because of the distribution of wages?
+par(mfrow=c(2,2))
+plot(lmfit)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-108-1.png" /><!-- --></p>
+<pre class="r"><code># Distribution of wages -&gt; it doesnt seem a very normally distributed plot
+plot(density(SLID$wages, na.rm = TRUE))
+
+# Taking the log -&gt; a bit better...
+plot(density(log(SLID$wages), na.rm = TRUE))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-108-2.png" /><!-- --></p>
+</div>
+<div id="third-linear-model" class="section level2">
+<h2><span class="header-section-number">4.3</span> Third linear model</h2>
+<pre class="r"><code># Applying log transformation --&gt; much better both R-squared and the plots
+lmfit = lm(log(wages) ~ age + sex + education, data = SLID)
+summary(lmfit)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log(wages) ~ age + sex + education, data = SLID)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.36252 -0.27716  0.01428  0.28625  1.56588 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.1168632  0.0385480   28.97   &lt;2e-16 ***
+## age         0.0176334  0.0005476   32.20   &lt;2e-16 ***
+## sexMale     0.2244032  0.0132238   16.97   &lt;2e-16 ***
+## education   0.0552139  0.0021891   25.22   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.4187 on 4010 degrees of freedom
+##   (3411 observations deleted due to missingness)
+## Multiple R-squared:  0.3094, Adjusted R-squared:  0.3089 
+## F-statistic: 598.9 on 3 and 4010 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>par(mfrow=c(2,2))
+plot(lmfit)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-109-1.png" /><!-- --></p>
+<div id="checking-multicolinearity" class="section level3">
+<h3><span class="header-section-number">4.3.1</span> Checking multicolinearity</h3>
+<p>Multicolinearity takes place when a predictor is highly correlated with others. If multicolinearity exists in the models, you might see some of the variables have a high r-squared value but at the same time, they are statistically insignificant variables. To detect multicolinearity, we can calculate the variance inflation, and if the values are above 2, we can say thay those factors are colinear. Once you have found multicolinearity, that means there is no need to have 2 very similar variables in the model, so either you remove 1 of them, or you apply PCA to group them.</p>
+<pre class="r"><code>vif(lmfit)</code></pre>
+<pre><code>##       age   sexMale education 
+##  1.011613  1.000834  1.012179</code></pre>
+</div>
+<div id="checking-heteroscedasticity" class="section level3">
+<h3><span class="header-section-number">4.3.2</span> Checking Heteroscedasticity</h3>
+<p>Heteroscedasticity checks if the variance is unequal across observations.</p>
+<pre class="r"><code>library(lmtest)
+
+# As p-value less than 0.05, reject H0 (homoscedasticity).
+bptest(lmfit)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  lmfit
+## BP = 29.031, df = 3, p-value = 2.206e-06</code></pre>
+</div>
+<div id="ols" class="section level3">
+<h3><span class="header-section-number">4.3.3</span> OLS</h3>
+<pre class="r"><code>library(rms)
+olsfit = ols(log(wages) ~ age + sex + education, data= SLID, x=TRUE, y= TRUE)
+robcov(olsfit)</code></pre>
+<pre><code>## Frequencies of Missing Values Due to Each Variable
+## log(wages)        age        sex  education 
+##       3278          0          0        249 
+## 
+## Linear Regression Model
+##  
+##  ols(formula = log(wages) ~ age + sex + education, data = SLID, 
+##      x = TRUE, y = TRUE)
+##  
+##  
+##                  Model Likelihood     Discrimination    
+##                     Ratio Test           Indexes        
+##  Obs    4014    LR chi2    1486.08    R2       0.309    
+##  sigma0.4187    d.f.             3    R2 adj   0.309    
+##  d.f.   4010    Pr(&gt; chi2)  0.0000    g        0.315    
+##  
+##  Residuals
+##  
+##       Min       1Q   Median       3Q      Max 
+##  -2.36252 -0.27716  0.01428  0.28625  1.56588 
+##  
+##  
+##            Coef   S.E.   t     Pr(&gt;|t|)
+##  Intercept 1.1169 0.0387 28.90 &lt;0.0001 
+##  age       0.0176 0.0006 30.15 &lt;0.0001 
+##  sex=Male  0.2244 0.0132 16.96 &lt;0.0001 
+##  education 0.0552 0.0022 24.82 &lt;0.0001 
+## </code></pre>
+<p><br></p>
+</div>
+</div>
+</div>
+<div id="glms" class="section level1">
+<h1><span class="header-section-number">5</span> GLMs</h1>
+<div id="gaussian-model-in-a-glm" class="section level2">
+<h2><span class="header-section-number">5.1</span> Gaussian model in a GLM</h2>
+<p>Basically, a GLM is a generalization for linear models. For example, the previous linear models we built are part of the GLM family. To show this, below we fit a GLM with a gaussian link function or family and normal linear model. Both show the same results.</p>
+<pre class="r"><code>lmfit1 = glm(wages ~ age + sex + education, data = SLID,family=gaussian)
+summary(lmfit1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = wages ~ age + sex + education, family = gaussian, 
+##     data = SLID)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -26.111   -4.328   -0.792    3.243   35.892  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -7.905243   0.607771  -13.01   &lt;2e-16 ***
+## age          0.255101   0.008634   29.55   &lt;2e-16 ***
+## sexMale      3.465251   0.208494   16.62   &lt;2e-16 ***
+## education    0.918735   0.034514   26.62   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 43.58492)
+## 
+##     Null deviance: 248686  on 4013  degrees of freedom
+## Residual deviance: 174776  on 4010  degrees of freedom
+##   (3411 observations deleted due to missingness)
+## AIC: 26549
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>lmfit2 = lm(wages ~ age + sex + education, data = SLID)
+summary(lmfit2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wages ~ age + sex + education, data = SLID)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -26.111  -4.328  -0.792   3.243  35.892 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -7.905243   0.607771  -13.01   &lt;2e-16 ***
+## age          0.255101   0.008634   29.55   &lt;2e-16 ***
+## sexMale      3.465251   0.208494   16.62   &lt;2e-16 ***
+## education    0.918735   0.034514   26.62   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.602 on 4010 degrees of freedom
+##   (3411 observations deleted due to missingness)
+## Multiple R-squared:  0.2972, Adjusted R-squared:  0.2967 
+## F-statistic: 565.3 on 3 and 4010 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Usig ANOVA to compare both models</p>
+<pre class="r"><code># Anova shows that both models are very similar, as we have similar residual degrees of freedom
+anova(lmfit1, lmfit2)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: gaussian, link: identity
+## 
+## Response: wages
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##           Df Deviance Resid. Df Resid. Dev
+## NULL                       4013     248686
+## age        1    31953      4012     216733
+## sex        1    11074      4011     205659
+## education  1    30883      4010     174776</code></pre>
+</div>
+<div id="poisson-model-in-a-glm" class="section level2">
+<h2><span class="header-section-number">5.2</span> Poisson model in a GLM</h2>
+<pre class="r"><code>data(warpbreaks)
+head(warpbreaks)</code></pre>
+<pre><code>##   breaks wool tension
+## 1     26    A       L
+## 2     30    A       L
+## 3     54    A       L
+## 4     25    A       L
+## 5     70    A       L
+## 6     52    A       L</code></pre>
+<pre class="r"><code>rs1 = glm(breaks ~ tension, data=warpbreaks, family=&quot;poisson&quot;)
+
+summary(rs1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = breaks ~ tension, family = &quot;poisson&quot;, data = warpbreaks)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -4.2464  -1.6031  -0.5872   1.2813   4.9366  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  3.59426    0.03907  91.988  &lt; 2e-16 ***
+## tensionM    -0.32132    0.06027  -5.332 9.73e-08 ***
+## tensionH    -0.51849    0.06396  -8.107 5.21e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 297.37  on 53  degrees of freedom
+## Residual deviance: 226.43  on 51  degrees of freedom
+## AIC: 507.09
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div id="binomial-model-in-a-glm" class="section level2">
+<h2><span class="header-section-number">5.3</span> Binomial model in a GLM</h2>
+<p>Good for a binary dependant variable</p>
+<pre class="r"><code>head(mtcars$vs)</code></pre>
+<pre><code>## [1] 0 0 1 1 0 1</code></pre>
+<pre class="r"><code>lm1 = glm(vs ~ hp+mpg+gear,data=mtcars, family=binomial)
+
+summary(lm1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = vs ~ hp + mpg + gear, family = binomial, data = mtcars)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.68166  -0.23743  -0.00945   0.30884   1.55688  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept) 11.95183    8.00322   1.493   0.1353  
+## hp          -0.07322    0.03440  -2.129   0.0333 *
+## mpg          0.16051    0.27538   0.583   0.5600  
+## gear        -1.66526    1.76407  -0.944   0.3452  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 43.860  on 31  degrees of freedom
+## Residual deviance: 15.651  on 28  degrees of freedom
+## AIC: 23.651
+## 
+## Number of Fisher Scoring iterations: 7</code></pre>
+<pre class="r"><code>lm1 = glm(vs ~ hp+mpg+gear,data=mtcars,family=binomial(link=&quot;probit&quot;))</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summary(lm1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = vs ~ hp + mpg + gear, family = binomial(link = &quot;probit&quot;), 
+##     data = mtcars)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.66320  -0.17820  -0.00014   0.26087   1.54319  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)  7.34108    4.56895   1.607   0.1081  
+## hp          -0.04456    0.01912  -2.331   0.0198 *
+## mpg          0.09401    0.16360   0.575   0.5655  
+## gear        -1.01178    1.00203  -1.010   0.3126  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 43.860  on 31  degrees of freedom
+## Residual deviance: 15.275  on 28  degrees of freedom
+## AIC: 23.275
+## 
+## Number of Fisher Scoring iterations: 9</code></pre>
+<p><br></p>
+</div>
+</div>
+<div id="gams" class="section level1">
+<h1><span class="header-section-number">6</span> GAMs</h1>
+<p><img src="images/6.PNG" width="687" /></p>
+<div id="fit-gam" class="section level2">
+<h2><span class="header-section-number">6.1</span> Fit GAM</h2>
+<pre class="r"><code>library(mgcv)
+library(MASS)
+attach(Boston)</code></pre>
+<pre><code>## The following objects are masked from Boston (pos = 3):
+## 
+##     age, black, chas, crim, dis, indus, lstat, medv, nox, ptratio, rad, rm, tax, zn</code></pre>
+<pre><code>## The following objects are masked from Boston (pos = 4):
+## 
+##     age, black, chas, crim, dis, indus, lstat, medv, nox, ptratio, rad, rm, tax, zn</code></pre>
+<pre><code>## The following objects are masked from Boston (pos = 5):
+## 
+##     age, black, chas, crim, dis, indus, lstat, medv, nox, ptratio, rad, rm, tax, zn</code></pre>
+<pre><code>## The following objects are masked from Boston (pos = 6):
+## 
+##     age, black, chas, crim, dis, indus, lstat, medv, nox, ptratio, rad, rm, tax, zn</code></pre>
+<pre class="r"><code>str(Boston)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    506 obs. of  14 variables:
+##  $ crim   : num  0.00632 0.02731 0.02729 0.03237 0.06905 ...
+##  $ zn     : num  18 0 0 0 0 0 12.5 12.5 12.5 12.5 ...
+##  $ indus  : num  2.31 7.07 7.07 2.18 2.18 2.18 7.87 7.87 7.87 7.87 ...
+##  $ chas   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ nox    : num  0.538 0.469 0.469 0.458 0.458 0.458 0.524 0.524 0.524 0.524 ...
+##  $ rm     : num  6.58 6.42 7.18 7 7.15 ...
+##  $ age    : num  65.2 78.9 61.1 45.8 54.2 58.7 66.6 96.1 100 85.9 ...
+##  $ dis    : num  4.09 4.97 4.97 6.06 6.06 ...
+##  $ rad    : int  1 2 2 3 3 3 5 5 5 5 ...
+##  $ tax    : num  296 242 242 222 222 222 311 311 311 311 ...
+##  $ ptratio: num  15.3 17.8 17.8 18.7 18.7 18.7 15.2 15.2 15.2 15.2 ...
+##  $ black  : num  397 397 393 395 397 ...
+##  $ lstat  : num  4.98 9.14 4.03 2.94 5.33 ...
+##  $ medv   : num  24 21.6 34.7 33.4 36.2 28.7 22.9 27.1 16.5 18.9 ...</code></pre>
+<pre class="r"><code>plot(Boston$nox, Boston$dis)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-118-1.png" /><!-- --></p>
+<pre class="r"><code>fit = gam(dis ~ s(nox))
+summary(fit)</code></pre>
+<pre><code>## 
+## Family: gaussian 
+## Link function: identity 
+## 
+## Formula:
+## dis ~ s(nox)
+## 
+## Parametric coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  3.79504    0.04507   84.21   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Approximate significance of smooth terms:
+##          edf Ref.df   F p-value    
+## s(nox) 8.434  8.893 189  &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## R-sq.(adj) =  0.768   Deviance explained = 77.2%
+## GCV = 1.0472  Scale est. = 1.0277    n = 506</code></pre>
+</div>
+<div id="visualize-gam" class="section level2">
+<h2><span class="header-section-number">6.2</span> Visualize GAM</h2>
+<pre class="r"><code>x = seq(0, 1, length = 500)
+y = predict(fit, data.frame(nox = x))
+
+
+## PLOT PREDICTIONS
+plot(Boston$nox, Boston$dis)
+lines(x, y, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-119-1.png" /><!-- --></p>
+<pre class="r"><code>## PLOT FIT
+plot(fit)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-119-2.png" /><!-- --></p>
+<pre class="r"><code>## EXTRA MODEL + VISUALIZE EXTRA INFO
+fit2=gam(medv~crim+zn+crim:zn, data=Boston)
+vis.gam(fit2)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-119-3.png" /><!-- --></p>
+</div>
+<div id="diagnose-gam" class="section level2">
+<h2><span class="header-section-number">6.3</span> Diagnose GAM</h2>
+<pre class="r"><code>gam.check(fit)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-120-1.png" /><!-- --><img src="index_files/figure-html/unnamed-chunk-120-2.png" /><!-- --><img src="index_files/figure-html/unnamed-chunk-120-3.png" /><!-- --><img src="index_files/figure-html/unnamed-chunk-120-4.png" /><!-- --></p>
+<pre><code>## 
+## Method: GCV   Optimizer: magic
+## Smoothing parameter selection converged after 7 iterations.
+## The RMS GCV score gradient at convergence was 8.79622e-06 .
+## The Hessian was positive definite.
+## Model rank =  10 / 10 
+## 
+## Basis dimension (k) checking results. Low p-value (k-index&lt;1) may
+## indicate that k is too low, especially if edf is close to k&#39;.
+## 
+##          k&#39;  edf k-index p-value    
+## s(nox) 9.00 8.43     0.4  &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
